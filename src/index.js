@@ -2,6 +2,8 @@ import axios from 'axios';
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 
+const API_KEY = '34760614-c151dedd5f6572838af89f3cc';
+
 const formInputRef = document.querySelector('#search-form')
 const submitButton = document.querySelector('[type="submit"]')
 const divGallery = document.querySelector('.gallery')
@@ -34,10 +36,11 @@ const createMarkup = data => {
 
 formInputRef.addEventListener('submit', (ev) => {
     ev.preventDefault();
-    const product = axios.get('https://pixabay.com/api/')
+    const product = axios.get('https://pixabay.com/api/?key=34760614-c151dedd5f6572838af89f3cc&q=yellow+flowers&image_type=photo')
         .then(response => response.data)
         .then(createMarkup)
         .then((markup) => divGallery.insertAdjacentHTML('beforeend', markup))
-
+    console.log(product);
 })
-console.log(product);
+
+// let BASE_URL = "https://pixabay.com/api/?key=" + API_KEY + "&q=" + encodeURIComponent('red roses');
