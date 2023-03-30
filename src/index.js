@@ -41,33 +41,32 @@ const galleryEl = document.querySelector('.gallery .a')
 formInputRef.addEventListener('submit', (ev) => {
   ev.preventDefault();
   const formData = new FormData(formInputRef);
-  const queryValue = formData.get('searchQuery')
+  const queryValue = formData.get('searchQuery').trim()
+  if (!queryValue) {
+    alert('Enter smt')
+    return;
+  }
   console.log(queryValue);
 
   const product = axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`)
     .then(result => result.data
-    ).then((data) => {
-      console.log(data)
-      const markup = data.hits.map(({ userImageURL, id, likes, views, downloads }) => {
-        return `<li>
-        <a>${userImageURL}</a>
+    ).then(createMarkup)
+    .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
+  console.log(product);
+
+})
+
+const createMarkup = (data) => {
+  console.log(data)
+  const markup = data.hits.map(({ userImageURL, tags, id, likes, views, downloads }) => {
+    return `<li>
+        <img src=${userImageURL} alt=${tags}>
           <p>${id}</p>
           <p>${likes}</p>
           <p>${views}</p>
           <p>${downloads}</p>
         </li>`
-      })
-        .join('')
-      return markup
-    })
-    .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
-  console.log(product);
-
-
-  //   .then(renderGallery)
-  //   .then((markup) => divGallery.insertAdjacentHTML('beforeend', markup))
-  // // alert(`'Hooray! We found ${totalHits} images.'`)
-  // console.log(product);
-})
-
-
+  })
+    .join('')
+  return markup
+}
