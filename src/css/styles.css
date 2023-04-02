@@ -187,21 +187,23 @@ a {
   margin-left: 5px;
 }
 
-.btn-load-more.is-hidden {
-  display: none;
-}
-
 .btn-load-more {
   display: block;
   margin: 25px auto 0 auto;
   padding: 8px 20px;
   border: none;
   border-radius: 5px;
-  background-color: #3f57b3;
+  background-color: #25202069;
   box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
   font: inherit;
   color: white;
   cursor: pointer;
+  visibility: hidden;
+}
+
+.btn-load-more-visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 .btn-to-top {
@@ -215,11 +217,10 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #3f57b3;
+  background: #25202069;
   box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
   color: white;
   cursor: pointer;
-  opacity: 0;
   visibility: hidden;
 }
 

@@ -6,13 +6,25 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 const API_KEY = '34760614-c151dedd5f6572838af89f3cc';
 const BASE_URL = 'https://pixabay.com/api/';
 const perPage = 40
-let page;
+let page = 2;
 
 const formInputRef = document.querySelector('#search-form')
 const formInputValue = document.querySelector('.input')
 const submitButton = document.querySelector('[type="submit"]')
 const divGallery = document.querySelector('.gallery')
 const galleryEl = document.querySelector('.gallery .a')
+
+
+const loadMoreBtn = document.querySelector('.btn-load-more')
+
+loadMoreBtn.addEventListener('click', onLoadMoreBtn)
+
+
+const toUpBtn = document.querySelector('.btn-to-top')
+
+window.addEventListener('scroll', onScroll)
+toUpBtn.addEventListener('click', onToUpBtn)
+
 
 
 formInputRef.addEventListener('submit', (ev) => {
@@ -30,7 +42,6 @@ formInputRef.addEventListener('submit', (ev) => {
     .then(createMarkup)
     .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
   console.log(product);
-
 })
 
 const createMarkup = (data) => {
@@ -55,3 +66,51 @@ const createMarkup = (data) => {
     .join('')
   return markup
 }
+
+
+
+
+function onScroll() {
+  const scrolled = window.pageYOffset
+  const coords = document.documentElement.clientHeight
+
+  if (scrolled > coords) {
+    toUpBtn.classList.add('btn-to-top--visible')
+    loadMoreBtn.classList.add('btn-load-more-visible')
+  }
+  if (scrolled < coords) {
+    toUpBtn.classList.remove('btn-to-top--visible')
+
+  }
+}
+
+function onToUpBtn() {
+  if (window.pageYOffset > 0) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+
+function onLoadMoreBtn() {
+
+
+}
+
+
+
+
+
+
+
+
+
+// window.onScroll = function () {
+//   if (window.pageYOffset >= window.innerHeight) {
+//     toUpBtn.style.opacity = '1';
+//   } else if (window.pageYOffset <= window.innerHeight) {
+//     toUpBtn.style.display = 'none';
+//   }
+//   toUpBtn.onclick = function () {
+//     window.scrollTo(0, 0, { behavior: "smooth" });
+//   }
+// }
