@@ -6,7 +6,7 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 const API_KEY = '34760614-c151dedd5f6572838af89f3cc';
 const BASE_URL = 'https://pixabay.com/api/';
 const perPage = 40
-let page = 2;
+let pageNumber = 1;
 
 const formInputRef = document.querySelector('#search-form')
 const formInputValue = document.querySelector('.input')
@@ -27,7 +27,9 @@ toUpBtn.addEventListener('click', onToUpBtn)
 
 
 
-formInputRef.addEventListener('submit', (ev) => {
+formInputRef.addEventListener('submit', onSearchSmt)
+
+function onSearchSmt(ev) {
   ev.preventDefault();
   const formData = new FormData(formInputRef);
   const queryValue = formData.get('searchQuery').trim()
@@ -37,12 +39,13 @@ formInputRef.addEventListener('submit', (ev) => {
   }
   console.log(queryValue);
 
-  let product = axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`)
+  let product = axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=${perPage}`)
     .then(result => result.data)
     .then(createMarkup)
     .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
   console.log(product);
-})
+  onLoadMoreBtn()
+};
 
 const createMarkup = (data) => {
   console.log(data)
@@ -91,10 +94,13 @@ function onToUpBtn() {
 }
 
 
-function onLoadMoreBtn() {
+// function onLoadMoreBtn() {
+//   pageNumber = 1;
+//   pageNumber = pageNumber + 1;
 
 
-}
+//   console.log(pageNumber);
+// }
 
 
 

@@ -95,7 +95,7 @@ a {
 
 .search-form button:hover,
 .search-form button:focus {
-  background-color: rgba(30, 17, 17, 0.852);
+  background-color: #2b3e88;
   transition: all 0.3s;
 }
 
