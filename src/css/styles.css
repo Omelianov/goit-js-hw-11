@@ -29,6 +29,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: #212121;
   line-height: 1.5;
+  background-color: #6b829e;
 }
 
 a {
@@ -126,7 +127,7 @@ a {
 }
 
 .gallery {
-  margin-top: 15px;
+  /* margin-top: 15px; */
   /* padding-top: calc(-1 * 30px);
   padding-left: calc(-1 * 30px); */
   justify-content: center;
@@ -152,7 +153,7 @@ a {
 .gallery-item__img:hover,
 .gallery-item__img:focus {
   transform: scale(1.05);
-  transition-duration: 500ms;
+  transition-duration: 700ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -187,9 +188,9 @@ a {
   margin-left: 5px;
 }
 
-.btn-load-more {
+.load-more {
   display: block;
-  margin: 25px auto 0 auto;
+  margin: 25px auto 25px auto;
   padding: 8px 20px;
   border: none;
   border-radius: 5px;
@@ -198,12 +199,11 @@ a {
   font: inherit;
   color: white;
   cursor: pointer;
-  visibility: hidden;
 }
 
-.btn-load-more-visible {
-  opacity: 1;
-  visibility: visible;
+.is-hidden {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .btn-to-top {
@@ -229,7 +229,7 @@ a {
   visibility: visible;
 }
 
-.btn-load-more:hover,
+.load-more:hover,
 .btn-to-top:hover {
   background-color: #2b3e88;
   transition: all 0.3s;

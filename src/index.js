@@ -6,53 +6,73 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 const API_KEY = '34760614-c151dedd5f6572838af89f3cc';
 const BASE_URL = 'https://pixabay.com/api/';
 const perPage = 40
-let pageNumber = 1;
+let queryValue = ''
+let pageNumber;
+
 
 const formInputRef = document.querySelector('#search-form')
 const formInputValue = document.querySelector('.input')
-const submitButton = document.querySelector('[type="submit"]')
+
 const divGallery = document.querySelector('.gallery')
 const galleryEl = document.querySelector('.gallery .a')
-
-
-const loadMoreBtn = document.querySelector('.btn-load-more')
-
-loadMoreBtn.addEventListener('click', onLoadMoreBtn)
-
-
+const loadMoreBtn = document.querySelector('.load-more')
 const toUpBtn = document.querySelector('.btn-to-top')
 
+formInputRef.addEventListener('submit', onSearchSmt)
+loadMoreBtn.addEventListener('click', onLoadMoreBtn)
 window.addEventListener('scroll', onScroll)
 toUpBtn.addEventListener('click', onToUpBtn)
 
+// let simpleLightbox = new SimpleLightbox('.gallery', {
+//   captions: true,
+//   captionsData: 'alt',
+//   captionDelay: 250,
+// });
 
 
-formInputRef.addEventListener('submit', onSearchSmt)
 
 function onSearchSmt(ev) {
   ev.preventDefault();
+  pageNumber = 1;
+  divGallery.innerHTML = '';
+  loadMoreBtn.classList.add('is-hidden');
   const formData = new FormData(formInputRef);
   const queryValue = formData.get('searchQuery').trim()
   if (!queryValue) {
-    alert('Enter smt')
+    alertNoImagesFound()
     return;
   }
-  console.log(queryValue);
+  if (queryValue === '') {
+    alertEmptyQuery()
+    return;
+  }
 
-  let product = axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=${perPage}`)
+  fetchImages(queryValue, pageNumber, perPage)
     .then(result => result.data)
     .then(createMarkup)
     .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
-  console.log(product);
-  onLoadMoreBtn()
+
+  // if (data.totalHits > 0) {
+  //   alertTotalImagesFound()
+  //   console.log(data.totalHits);
+  // }
+
 };
 
-const createMarkup = (data) => {
-  console.log(data)
-  if (data.total === 0) {
-    alert('Sorry, there are no images matching your search query. Please try again.')
-  }
-  console.log(data.total)
+async function fetchImages(queryValue, pageNumber, perPage) {
+  const response = await axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=${perPage}`,)
+  console.log(response.data.totalHits);
+
+  return response
+
+
+}
+
+
+
+
+
+function createMarkup(data) {
   const markup = data.hits.map(({ id, largeImageURL, webformatURL, tags, likes, views, comments, downloads }) => {
     return `<a class="gallery__link" href="${largeImageURL}">
           <div class="gallery-item" id="${id}">
@@ -71,15 +91,13 @@ const createMarkup = (data) => {
 }
 
 
-
-
 function onScroll() {
   const scrolled = window.pageYOffset
   const coords = document.documentElement.clientHeight
 
   if (scrolled > coords) {
     toUpBtn.classList.add('btn-to-top--visible')
-    loadMoreBtn.classList.add('btn-load-more-visible')
+    loadMoreBtn.classList.remove('is-hidden')
   }
   if (scrolled < coords) {
     toUpBtn.classList.remove('btn-to-top--visible')
@@ -94,15 +112,44 @@ function onToUpBtn() {
 }
 
 
-// function onLoadMoreBtn() {
-//   pageNumber = 1;
-//   pageNumber = pageNumber + 1;
+function onLoadMoreBtn() {
+  // pageNumber = pageNumber + 1;
+  // // simpleLightBox.destroy()
+  // // return pageNumber
+}
 
+function alertTotalImagesFound(data) {
+  Notiflix.Notify.success(`'Hooray! We found ${response.data.totalHits} images.'`)
+}
 
-//   console.log(pageNumber);
-// }
+function alertNoImagesFound() {
+  Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+}
 
+function alertReachedImages() {
+  Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
+}
 
+function alertEmptyQuery() {
+  Notiflix.Notify.failure('Please write something and try again.')
+}
+
+const alerts = (data) => {
+  console.log(data)
+  const totalFreeQueryes = Math.ceil(data.totalHits / perPage)
+  if ((pageNumber > totalFreeQueryes)) {
+    loadMoreBtn.classList.remove('load-more-visible')
+    Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
+  }
+  console.log(data.totalHits);
+  if (data.totalHits === 0) {
+    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+  }
+  console.log(data.total)
+  if (data.totalHits > 0) {
+    alertTotalImagesFound
+  }
+}
 
 
 
