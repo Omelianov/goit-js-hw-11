@@ -11,7 +11,7 @@ let pageNumber;
 
 
 const formInputRef = document.querySelector('#search-form')
-const formInputValue = document.querySelector('.input')
+// const formInputValue = document.querySelector('.input')
 
 const divGallery = document.querySelector('.gallery')
 const galleryEl = document.querySelector('.gallery .a')
@@ -39,25 +39,37 @@ function onSearchSmt(ev) {
   const formData = new FormData(formInputRef);
   const queryValue = formData.get('searchQuery').trim()
   if (!queryValue) {
-    alertNoImagesFound()
-    return;
-  }
-  if (queryValue === '') {
     alertEmptyQuery()
     return;
   }
 
+
   fetchImages(queryValue, pageNumber, perPage)
-    .then(result => result.data)
-    .then(createMarkup)
+    .then(({ data }) => {
+      if ((pageNumber > (Math.ceil(data.totalHits / perPage)))) {
+        loadMoreBtn.classList.remove('load-more-visible')
+        alertReachedImages()
+      }
+      if (data.totalHits === 0) {
+        alertNoImagesFound()
+
+      } else {
+        createMarkup(data)
+        simpleLightBox = new SimpleLightbox('.gallery a').refresh()
+        alertTotalImagesFound(data)
+
+        if (data.totalHits > perPage) {
+          loadMoreBtn.classList.remove('is-hidden')
+        }
+      }
+    })
+
+    .then(createMarkup(data))
     .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
 
-  // if (data.totalHits > 0) {
-  //   alertTotalImagesFound()
-  //   console.log(data.totalHits);
-  // }
+}
 
-};
+
 
 async function fetchImages(queryValue, pageNumber, perPage) {
   const response = await axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=${perPage}`,)
@@ -67,9 +79,6 @@ async function fetchImages(queryValue, pageNumber, perPage) {
 
 
 }
-
-
-
 
 
 function createMarkup(data) {
@@ -119,7 +128,7 @@ function onLoadMoreBtn() {
 }
 
 function alertTotalImagesFound(data) {
-  Notiflix.Notify.success(`'Hooray! We found ${response.data.totalHits} images.'`)
+  Notiflix.Notify.success(`'Hooray! We found ${data.totalHits} images.'`)
 }
 
 function alertNoImagesFound() {
@@ -134,22 +143,22 @@ function alertEmptyQuery() {
   Notiflix.Notify.failure('Please write something and try again.')
 }
 
-const alerts = (data) => {
-  console.log(data)
-  const totalFreeQueryes = Math.ceil(data.totalHits / perPage)
-  if ((pageNumber > totalFreeQueryes)) {
-    loadMoreBtn.classList.remove('load-more-visible')
-    Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
-  }
-  console.log(data.totalHits);
-  if (data.totalHits === 0) {
-    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-  }
-  console.log(data.total)
-  if (data.totalHits > 0) {
-    alertTotalImagesFound
-  }
-}
+// const alerts = (data) => {
+//   console.log(data)
+//   const totalFreeQueryes = Math.ceil(data.totalHits / perPage)
+//   if ((pageNumber > totalFreeQueryes)) {
+//     loadMoreBtn.classList.remove('load-more-visible')
+//     Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
+//   }
+//   console.log(data.totalHits);
+//   if (data.totalHits === 0) {
+//     Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+//   }
+//   console.log(data.total)
+//   if (data.totalHits > 0) {
+//     alertTotalImagesFound
+//   }
+// }
 
 
 
