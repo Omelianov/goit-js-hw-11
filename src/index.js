@@ -5,9 +5,9 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 
 const API_KEY = '34760614-c151dedd5f6572838af89f3cc';
 const BASE_URL = 'https://pixabay.com/api/';
-const perPage = 40
+let perPage = 40;
 let queryValue = ''
-let pageNumber;
+let pageNumber = 0;
 
 
 const formInputRef = document.querySelector('#search-form')
@@ -23,17 +23,17 @@ loadMoreBtn.addEventListener('click', onLoadMoreBtn)
 window.addEventListener('scroll', onScroll)
 toUpBtn.addEventListener('click', onToUpBtn)
 
-// let simpleLightbox = new SimpleLightbox('.gallery', {
-//   captions: true,
-//   captionsData: 'alt',
-//   captionDelay: 250,
-// });
+let simpleLightbox = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
 
 
-function onSearchSmt(ev) {
+async function onSearchSmt(ev) {
   ev.preventDefault();
-  pageNumber = 1;
+  pageNumber += 1;
   divGallery.innerHTML = '';
   loadMoreBtn.classList.add('is-hidden');
   const formData = new FormData(formInputRef);
@@ -44,31 +44,51 @@ function onSearchSmt(ev) {
   }
 
 
-  fetchImages(queryValue, pageNumber, perPage)
-    .then(({ data }) => {
-      if ((pageNumber > (Math.ceil(data.totalHits / perPage)))) {
-        loadMoreBtn.classList.remove('load-more-visible')
-        alertReachedImages()
-      }
-      if (data.totalHits === 0) {
-        alertNoImagesFound()
+  try {
+    const { data } = await fetchImages(queryValue, pageNumber, perPage);
 
-      } else {
-        createMarkup(data)
-        simpleLightBox = new SimpleLightbox('.gallery a').refresh()
-        alertTotalImagesFound(data)
 
-        if (data.totalHits > perPage) {
-          loadMoreBtn.classList.remove('is-hidden')
-        }
-      }
-    })
+    if (data.totalHits === 0) {
+      alertNoImagesFound()
 
-    .then(createMarkup(data))
-    .then((markup) => { divGallery.insertAdjacentHTML('beforeend', markup) })
+    } else {
+      createMarkup(data)
+      simpleLightbox = new SimpleLightbox('.gallery a').refresh()
+      alertTotalImagesFound(data)
+      loadMoreBtn.classList.remove('is-hidden')
+    }
+    divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+  } catch (error) {
+    console.log(error);
+  }
 
 }
 
+async function onLoadMoreBtn() {
+  pageNumber += 1;
+  const formData = new FormData(formInputRef);
+  const queryValue = formData.get('searchQuery').trim();
+
+  try {
+    const { data } = await fetchImages(queryValue, pageNumber, perPage);
+    createMarkup(data);
+    simpleLightbox.refresh()
+
+    if ((pageNumber * perPage) > data.totalHits) {
+      loadMoreBtn.classList.add('is-hidden')
+      alertReachedImages()
+    } else {
+      createMarkup(data)
+      simpleLightbox = new SimpleLightbox('.gallery a').refresh()
+      alertTotalImagesFound(data)
+
+
+    }
+    divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 
 async function fetchImages(queryValue, pageNumber, perPage) {
@@ -76,8 +96,6 @@ async function fetchImages(queryValue, pageNumber, perPage) {
   console.log(response.data.totalHits);
 
   return response
-
-
 }
 
 
@@ -106,7 +124,6 @@ function onScroll() {
 
   if (scrolled > coords) {
     toUpBtn.classList.add('btn-to-top--visible')
-    loadMoreBtn.classList.remove('is-hidden')
   }
   if (scrolled < coords) {
     toUpBtn.classList.remove('btn-to-top--visible')
@@ -121,11 +138,7 @@ function onToUpBtn() {
 }
 
 
-function onLoadMoreBtn() {
-  // pageNumber = pageNumber + 1;
-  // // simpleLightBox.destroy()
-  // // return pageNumber
-}
+
 
 function alertTotalImagesFound(data) {
   Notiflix.Notify.success(`'Hooray! We found ${data.totalHits} images.'`)
@@ -161,18 +174,15 @@ function alertEmptyQuery() {
 // }
 
 
+// async function onLoadMoreBtn() {
+//   pageNumber += 1;
+//   const response = await fetchImages(queryValue, pageNumber);
+//   createMarkup(response.hits);
+//   lightbox.refresh();
+//   currentHits += response.hits.length;
 
-
-
-
-
-// window.onScroll = function () {
-//   if (window.pageYOffset >= window.innerHeight) {
-//     toUpBtn.style.opacity = '1';
-//   } else if (window.pageYOffset <= window.innerHeight) {
-//     toUpBtn.style.display = 'none';
-//   }
-//   toUpBtn.onclick = function () {
-//     window.scrollTo(0, 0, { behavior: "smooth" });
+//   if (currentHits === response.totalHits) {
+//     loadMoreBtn.classList.add('is-hidden');
+//     alertReachedImages()
 //   }
 // }
