@@ -64,10 +64,18 @@ async function onLoadMoreBtn() {
       alertReachedImages()
     }
     divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+
   } catch (error) {
   }
 }
-
+const galleryElement = document.querySelector(".gallery").firstElementChild;
+if (galleryElement) {
+  const { height: cardHeight } = galleryElement.getBoundingClientRect();
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: "smooth",
+  });
+}
 
 async function fetchImages(queryValue, pageNumber, perPage) {
   const response = await axios.get(`${BASE_URL}?key=${API_KEY}&q=${queryValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${pageNumber}&per_page=${perPage}`,)
