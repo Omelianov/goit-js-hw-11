@@ -33,19 +33,22 @@ async function onSearchSmt(ev) {
     alertEmptyQuery()
     return;
   }
-  try {
-    const { data } = await fetchImages(queryValue, pageNumber, perPage);
-    if (data.totalHits === 0) {
-      alertNoImagesFound()
-    } else {
-      lightbox.refresh()
-      alertTotalImagesFound(data)
-      loadMoreBtn.classList.remove('is-hidden')
-    }
-    divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
-  } catch (error) {
-  }
+  fetchImages(queryValue, pageNumber, perPage)
+    .then(({ data }) => {
+      if (data.totalHits === 0) {
+        alertNoImagesFound()
+      } else if (data.totalHits > 0) {
+        lightbox.refresh()
+        alertTotalImagesFound(data)
+        loadMoreBtn.classList.remove('is-hidden')
+        divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+      }
+    })
+    .catch(error => {
+      console.error(error);
+    })
 }
+
 
 async function onLoadMoreBtn() {
   pageNumber += 1;
@@ -56,11 +59,11 @@ async function onLoadMoreBtn() {
     const { data } = await fetchImages(queryValue, pageNumber, perPage);
     createMarkup(data);
     lightbox.refresh()
+    divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
     if ((pageNumber * perPage) > data.totalHits) {
       loadMoreBtn.classList.add('is-hidden')
       alertReachedImages()
     }
-    divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
 
     const galleryElement = document.querySelector(".gallery").firstElementChild;
     if (galleryElement) {
@@ -72,7 +75,7 @@ async function onLoadMoreBtn() {
     }
 
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
