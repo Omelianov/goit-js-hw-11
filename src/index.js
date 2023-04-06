@@ -1,6 +1,6 @@
-import axios from 'axios';
-import SimpleLightbox from 'simplelightbox';
-import "simplelightbox/dist/simple-lightbox.min.css";
+
+import SimpleLightbox from 'simplelightbox'
+import 'simplelightbox/dist/simple-lightbox.min.css'
 
 import { fetchImages } from './js/fetch-images';
 import { alertEmptyQuery, alertTotalImagesFound, alertNoImagesFound, alertReachedImages } from './js/alerts'
@@ -32,15 +32,14 @@ async function onSearchSmt(ev) {
   }
   fetchImages(queryValue, pageNumber, perPage)
     .then(({ data }) => {
-      console.log(data);
       if (data.totalHits === 0) {
         alertNoImagesFound()
       }
       else if (data.totalHits > 0) {
-        simpleLightBox = new SimpleLightbox('.photo-card a').refresh()
         alertTotalImagesFound(data)
         loadMoreBtn.classList.remove('is-hidden')
         divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+        simpleLightBox = new SimpleLightbox('.photo-card a').refresh()
       }
       if (data.totalHits < perPage) {
         loadMoreBtn.classList.add('is-hidden')
