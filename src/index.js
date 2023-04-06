@@ -7,10 +7,6 @@ import { alertEmptyQuery, alertTotalImagesFound, alertNoImagesFound, alertReache
 import { createMarkup } from './js/markup';
 import { onScroll, onToUpBtn } from './js/scroll-up-arrow';
 
-let lightbox = new SimpleLightbox('.photo-card a', {
-  captionDelay: 250,
-});
-
 const formInputRef = document.querySelector('#search-form')
 const divGallery = document.querySelector('.gallery')
 const loadMoreBtn = document.querySelector('.load-more')
@@ -18,13 +14,14 @@ const loadMoreBtn = document.querySelector('.load-more')
 formInputRef.addEventListener('submit', onSearchSmt)
 loadMoreBtn.addEventListener('click', onLoadMoreBtn)
 
+
 const perPage = 40;
 let queryValue = '';
-let pageNumber = 0;
+let pageNumber = 1;
 
 async function onSearchSmt(ev) {
   ev.preventDefault();
-  pageNumber += 1;
+  pageNumber = 1;
   divGallery.innerHTML = '';
   loadMoreBtn.classList.add('is-hidden');
   const formData = new FormData(formInputRef);
@@ -35,13 +32,18 @@ async function onSearchSmt(ev) {
   }
   fetchImages(queryValue, pageNumber, perPage)
     .then(({ data }) => {
+      console.log(data);
       if (data.totalHits === 0) {
         alertNoImagesFound()
-      } else if (data.totalHits > 0) {
-        lightbox.refresh()
+      }
+      else if (data.totalHits > 0) {
+        simpleLightBox = new SimpleLightbox('.photo-card a').refresh()
         alertTotalImagesFound(data)
         loadMoreBtn.classList.remove('is-hidden')
         divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+      }
+      if (data.totalHits < perPage) {
+        loadMoreBtn.classList.add('is-hidden')
       }
     })
     .catch(error => {
@@ -52,15 +54,16 @@ async function onSearchSmt(ev) {
 
 async function onLoadMoreBtn() {
   pageNumber += 1;
+  simpleLightBox.destroy()
   const formData = new FormData(formInputRef);
   const queryValue = formData.get('searchQuery').trim();
 
   try {
     const { data } = await fetchImages(queryValue, pageNumber, perPage);
     createMarkup(data);
-    lightbox.refresh()
+    simpleLightBox = new SimpleLightbox('.photo-card a').refresh()
     divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
-    if ((pageNumber * perPage) > data.totalHits) {
+    if ((pageNumber * perPage) > data.totalHits || data.hits < perPage) {
       loadMoreBtn.classList.add('is-hidden')
       alertReachedImages()
     }
@@ -82,3 +85,5 @@ async function onLoadMoreBtn() {
 
 onToUpBtn()
 onScroll()
+
+

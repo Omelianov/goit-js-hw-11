@@ -2,8 +2,8 @@
 export { createMarkup }
 
 function createMarkup(data) {
-    const markup = data.hits.map(({ id, largeImageURL, webformatURL, tags, likes, views, comments, downloads }) => {
-        return `
+  const markup = data.hits.map(({ largeImageURL, id, webformatURL, tags, likes, views, comments, downloads }) => {
+    return `
     <div class="photo-card">
     <a class="gallery__link" href="${largeImageURL}">
           <div class="gallery-item" id="${id}">
@@ -18,7 +18,7 @@ function createMarkup(data) {
           </div>
         </a>
         </div>`
-    })
-        .join('')
-    return markup
+  })
+    .join('')
+  return markup
 }
