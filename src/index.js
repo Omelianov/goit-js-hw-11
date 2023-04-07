@@ -18,6 +18,7 @@ loadMoreBtn.addEventListener('click', onLoadMoreBtn)
 const perPage = 40;
 let queryValue = '';
 let pageNumber = 1;
+let simpleLightBox = new SimpleLightbox('.photo-card a');
 
 async function onSearchSmt(ev) {
   ev.preventDefault();
@@ -60,8 +61,8 @@ async function onLoadMoreBtn() {
   try {
     const { data } = await fetchImages(queryValue, pageNumber, perPage);
     createMarkup(data);
-    simpleLightBox = new SimpleLightbox('.photo-card a').refresh()
     divGallery.insertAdjacentHTML('beforeend', createMarkup(data))
+    simpleLightBox = new SimpleLightbox('.photo-card a').refresh()
     if ((pageNumber * perPage) > data.totalHits || data.hits < perPage) {
       loadMoreBtn.classList.add('is-hidden')
       alertReachedImages()
